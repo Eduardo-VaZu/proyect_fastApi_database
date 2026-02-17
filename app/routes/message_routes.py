@@ -1,5 +1,5 @@
 from app.dependencies.message_dependencies import get_message_service, get_db
-from app.models.message_model import CreateMessage, ResponseMessage
+from app.models.message_model import SaveMessage, ResponseMessage
 from app.services.message_service import MessageService
 
 from fastapi import APIRouter, Depends, status, HTTPException
@@ -26,7 +26,7 @@ def get_all_messages(
     db: Session = Depends(get_db),
     service: MessageService = Depends(get_message_service),
 ):
-    return service.get_all_messages(db)
+    return service.find_all_messages(db)
 
 
 @router.get("/{message_id}", response_model=ResponseMessage)
@@ -35,7 +35,7 @@ def get_message_by_id(
     db: Session = Depends(get_db),
     service: MessageService = Depends(get_message_service),
 ):
-    message = service.get_message_by_id(db, message_id)
+    message = service.find_message_by_id(db, message_id)
     if not message:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=MESSAGE_NOT_FOUND
@@ -45,7 +45,7 @@ def get_message_by_id(
 
 @router.post("/", response_model=ResponseMessage, status_code=status.HTTP_201_CREATED)
 def create_message(
-    message: CreateMessage,
+    message: SaveMessage,
     db: Session = Depends(get_db),
     service: MessageService = Depends(get_message_service),
 ):
@@ -55,7 +55,7 @@ def create_message(
 @router.put("/{message_id}", response_model=ResponseMessage)
 def update_message(
     message_id: int,
-    message: CreateMessage,
+    message: SaveMessage,
     db: Session = Depends(get_db),
     service: MessageService = Depends(get_message_service),
 ):

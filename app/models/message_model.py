@@ -17,7 +17,7 @@ class Message(BaseModel):
     )
 
 
-class CreateMessage(BaseModel):
+class SaveMessage(BaseModel):
     message: str = Field(
         ...,
         min_length=8,
