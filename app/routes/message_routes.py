@@ -1,14 +1,12 @@
-from fastapi import APIRouter, Query, status
-from fastapi.params import Depends
-from fastapi import HTTPException
+from ..dependencies.message_dependencies import get_message_service, get_db
+from ..models.message_model import CreateMessage, ResponseMessage
+from ..services.message_service import MessageService
 
-from app.models.message_model import Message, CreateMessage, ResponseMessage
-from app.services.message_service import MessageService
-from app.dependecies.message_dependice import get_message_service
+from fastapi import APIRouter, Depends, status, HTTPException
+from sqlalchemy.orm import Session
+from typing import List
 
-from typing import List, Optional
-
-MESSAGE_NOT_FOUND = "Message not found"
+MESSAGE_NOT_FOUND = "Mensaje no encontrado"
 
 router = APIRouter(tags=["Messages"], prefix="/messages")
 
@@ -17,41 +15,28 @@ router = APIRouter(tags=["Messages"], prefix="/messages")
 def health_check():
     return {
         "status": "success",
-        "health_check": "Bienvenido a la API Profesional",
+        "message": "Bienvenido a la API Profesional con MySQL",
         "swagger": "http://127.0.0.1:8000/docs",
         "redoc": "http://127.0.0.1:8000/redoc",
     }
 
 
 @router.get("/", response_model=List[ResponseMessage])
-def get_all_messages(service: MessageService = Depends(get_message_service)):
-    messages = service.get_all_messages()
-    if messages is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=MESSAGE_NOT_FOUND
-        )
-    return messages
-
-
-@router.get("/{message_id}", response_model=Optional[ResponseMessage])
-def get_message_by_id(
-    message_id: int, service: MessageService = Depends(get_message_service)
-):
-    message = service.get_message_by_id(message_id)
-    if message is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=MESSAGE_NOT_FOUND
-        )
-    return message
-
-
-@router.get("/detail/id", response_model=Optional[ResponseMessage])
-def get_message_url_param(
-    message_id: int = Query(..., gt=1),
+def get_all_messages(
+    db: Session = Depends(get_db),
     service: MessageService = Depends(get_message_service),
 ):
-    message = service.get_message_by_id(message_id)
-    if message is None:
+    return service.get_all_messages(db)
+
+
+@router.get("/{message_id}", response_model=ResponseMessage)
+def get_message_by_id(
+    message_id: int,
+    db: Session = Depends(get_db),
+    service: MessageService = Depends(get_message_service),
+):
+    message = service.get_message_by_id(db, message_id)
+    if not message:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=MESSAGE_NOT_FOUND
         )
@@ -60,34 +45,37 @@ def get_message_url_param(
 
 @router.post("/", response_model=ResponseMessage, status_code=status.HTTP_201_CREATED)
 def create_message(
-    message: CreateMessage, service: MessageService = Depends(get_message_service)
+    message: CreateMessage,
+    db: Session = Depends(get_db),
+    service: MessageService = Depends(get_message_service),
 ):
-    return service.create_message(message)
+    return service.create_message(db, message)
 
 
-@router.put("/{message_id}", response_model=Optional[ResponseMessage])
+@router.put("/{message_id}", response_model=ResponseMessage)
 def update_message(
     message_id: int,
     message: CreateMessage,
+    db: Session = Depends(get_db),
     service: MessageService = Depends(get_message_service),
 ):
-
-    message = service.get_message_by_id(message_id)
-    if message is None:
+    updated_message = service.update_message(db, message_id, message)
+    if not updated_message:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=MESSAGE_NOT_FOUND
         )
-    return service.update_message(message_id, message)
+    return updated_message
 
 
-@router.delete("/{message_id}", response_model=bool)
+@router.delete("/{message_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_message(
     message_id: int,
+    db: Session = Depends(get_db),
     service: MessageService = Depends(get_message_service),
 ):
-    message = service.get_message_by_id(message_id)
-    if message is None:
+    success = service.delete_message(db, message_id)
+    if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=MESSAGE_NOT_FOUND
         )
-    return service.delete_message(message_id)
+    return None

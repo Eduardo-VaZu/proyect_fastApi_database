@@ -1,18 +1,20 @@
-from ..models.message_model import CreateMessage
 from ..entities.message_entities import MessageEntity
+from ..models.message_model import CreateMessage
 
 from sqlalchemy.orm import Session
-from typing import List, Optional
 from abc import ABC, abstractmethod
+from typing import List, Optional
 
 
-class MessageService(ABC):
-   @abstractmethod
+class MessageRepository(ABC):
+    @abstractmethod
     def get_all_messages(self, db: Session) -> List[MessageEntity]:
         pass
 
     @abstractmethod
-    def get_message_by_id(self, db: Session, message_id: int) -> Optional[MessageEntity]:
+    def get_message_by_id(
+        self, db: Session, message_id: int
+    ) -> Optional[MessageEntity]:
         pass
 
     @abstractmethod
