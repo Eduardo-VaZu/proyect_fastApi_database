@@ -1,5 +1,5 @@
-from ..entities.message_entities import MessageEntity
-from ..models.message_model import CreateMessage
+from app.entities.message_entities import MessageEntity
+from app.models.message_model import CreateMessage
 
 from sqlalchemy.orm import Session
 from abc import ABC, abstractmethod
@@ -18,7 +18,7 @@ class MessageRepository(ABC):
         pass
 
     @abstractmethod
-    def create_message(self, db: Session, message: CreateMessage) -> MessageEntity:
+    def create_message(self, db: Session, message: MessageEntity) -> MessageEntity:
         pass
 
     @abstractmethod

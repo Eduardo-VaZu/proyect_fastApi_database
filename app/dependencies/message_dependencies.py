@@ -1,6 +1,6 @@
-from ..repository.impl.messageImpl_repository import MessageRepositoryImpl
-from ..services.impl.messageImpl_service import MessageServiceImpl
-from ..config.db_config import SessionLocal
+from app.repository.impl.message_repository_impl import MessageRepositoryImpl
+from app.services.impl.message_service_impl import MessageServiceImpl
+from app.config.db_config import SessionLocal
 
 from functools import lru_cache
 

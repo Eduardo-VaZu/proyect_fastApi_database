@@ -1,5 +1,6 @@
-from ..repository.message_repository import MessageRepository
-from ..entities.message_entities import MessageEntity
+from app.repository.message_repository import MessageRepository
+from app.entities.message_entities import MessageEntity
+from app.models.message_model import CreateMessage
 
 from sqlalchemy.orm import Session
 from typing import List, Optional

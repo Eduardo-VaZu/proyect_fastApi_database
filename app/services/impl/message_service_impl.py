@@ -1,7 +1,7 @@
-from ..repository.message_repository import MessageRepository
-from ..services.message_service import MessageService
-from ..entities.message_entities import MessageEntity
-from ..models.message_model import CreateMessage, UpdateMessage
+from app.repository.message_repository import MessageRepository
+from app.services.message_service import MessageService
+from app.entities.message_entities import MessageEntity
+from app.models.message_model import CreateMessage, UpdateMessage
 
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -25,7 +25,8 @@ class MessageServiceImpl(MessageService):
             author_email=message.author_email,
             priority=message.priority,
         )
-        return self.repository.save_message(db, new_message)
+        # Fixed: save_message -> create_message
+        return self.repository.create_message(db, new_message)
 
     def update_message(
         self, db: Session, message_id: int, message: UpdateMessage

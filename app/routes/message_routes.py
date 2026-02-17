@@ -1,6 +1,6 @@
-from ..dependencies.message_dependencies import get_message_service, get_db
-from ..models.message_model import CreateMessage, ResponseMessage
-from ..services.message_service import MessageService
+from app.dependencies.message_dependencies import get_message_service, get_db
+from app.models.message_model import CreateMessage, ResponseMessage
+from app.services.message_service import MessageService
 
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
